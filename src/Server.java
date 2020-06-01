@@ -132,7 +132,7 @@ public class Server {
 
         private void handleClient() {
             try {
-                String input = "";
+                String input;
                 while (true) {
                     input = dataInputStream.readUTF();
                     System.out.println("Client sent : " + input);
@@ -158,7 +158,7 @@ public class Server {
                     } else {
                         dataOutputStream.writeUTF("Successfully Logged out!");
                         dataOutputStream.flush();
-                        clientSocket = null;
+                        clientSocket.close();
                         System.out.println("Connection closed!!!");
                         break;
                     }
@@ -180,8 +180,7 @@ public class Server {
         private ArrayList<Course> courses = new ArrayList<>();
         private ArrayList<User> users = new ArrayList<>();
         private HashMap<User, UserInfo> usersInfo = new HashMap<>();
-        private ServerSocket serverSocket;
-//        private Socket clientSocket;
+        //        private Socket clientSocket;
 //        private DataOutputStream dataOutputStream;
 //        private DataInputStream dataInputStream;
 //        private User currentUser;
@@ -206,7 +205,7 @@ public class Server {
         }
 
         private int getFirstTabCountNeededToWriteCourse(String courseName) {
-            int firstTabCount = 0;
+            int firstTabCount;
             if (courseName.length() < 4)
                 firstTabCount = 4;
             else if (courseName.length() < 8)
@@ -412,9 +411,9 @@ public class Server {
             System.out.println(getCoursesInfo());
 
 
-            serverSocket = new ServerSocket(8888);
+            ServerSocket serverSocket = new ServerSocket(8888);
             while (true) {
-                Socket clientSocket = null;
+                Socket clientSocket;
                 try {
                     System.out.println("Waiting for Client...");
                     clientSocket = serverSocket.accept();
@@ -424,6 +423,7 @@ public class Server {
                     new ClientHandler(clientSocket, dataOutputStream, dataInputStream, this).start();
                 } catch (Exception e) {
                     System.err.println("Error in accepting client!");
+                    break;
                 }
             }
 
